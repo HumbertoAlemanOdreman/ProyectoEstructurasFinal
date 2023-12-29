@@ -21,7 +21,6 @@ typedef struct Client {
     char ci[COL_SIZE];
     char address[COL_SIZE];
     char cellphone[COL_SIZE];
-
 } Client;
 
 typedef struct ClientNode {
