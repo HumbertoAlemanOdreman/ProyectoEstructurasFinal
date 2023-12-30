@@ -1,20 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define MALLOC_CLI (struct ClientNode *)malloc(sizeof(struct ClientNode))
-
-#ifndef ZERO
-#define ZERO 0
-#endif
-
-#ifndef LAST
-#define LAST -1
-#endif
-
-#ifndef COL_SIZE
-#define COL_SIZE 30
-#endif
+#include "definitions.h"
 
 typedef struct Client {
     char name[COL_SIZE];
