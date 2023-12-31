@@ -6,6 +6,7 @@
 #include "vendors.h"
 #include "clients.h"
 #include "definitions.h"
+#include "input.h"
 
 typedef struct Renglon {
     ArticleNode* art;
@@ -132,5 +133,73 @@ void PrintFacturaList(FacturaNode* list) {
     while (list) { 
         PrintSingleFactura(list);
         list = list->next;
+    }
+}
+
+ClientNode* GetBuyerClient(ClientNode** list) {
+    char input[256]; int position;
+    Client aux;
+    while (1) {
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Que cliente esta comprando?                  ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 1. Crear un cliente                          ||"); NL;
+        TAB; printf("|| 2. Seleccionar cliente por posisicion        ||"); NL;
+        TAB; printf("|| 3. Seleccionar cliente por campo             ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Regresar al menu de Facturas              ||");
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%3s");
+
+        if (input[0] == '0') { return NULL; }
+        if (input[0] == '1') {
+            aux = InputCreateClient();
+            if (LookForClient(*list, NULL, aux.ci, ZERO, ZERO) != NULL) {
+                TAB; printf("El Cliente ya se encuentra dentro de la lista"); NL;
+                return NULL;
+            } AppendClient(list, aux);
+        }
+        if (input[0] == '2') {
+            while (1) {
+                CLEAR;
+                TAB; printf("Ingrese la posicion donde Eliminar el Cliente: "); NL;
+                TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
+                TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
+                TAB; printf("Posicion: "); InputString(input, "%10s");
+                if (atoi(input) > 0) { position = atoi(input); break; }
+                if (!strcmp(input, "Inicio")) { position =  ZERO; break; }
+                if (!strcmp(input, "Final")) { position = LAST; break; }
+            } return GetClientFromPosition(list, position);
+        }
+        if (input[0] == '3') { return SearchClient(*list, 1); }
+    } return NULL;
+}
+
+void MenuArticle(ArticleNode** list) {
+    char input[256];
+    int posicion;
+    while (1) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Menu Manejo Articulos                        ||"); NL;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| 1. Crear una Factura                         ||"); NL;
+        TAB; printf("|| 2. Eliminar una Factura                      ||"); NL;
+        TAB; printf("|| 3. Modificar una Factura                     ||"); NL;
+        TAB; printf("|| 4. Buscar Factura en la lista                ||"); NL;
+        TAB; printf("|| 5. Leer lista de Facturas                    ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Regresar al Menu Principal                ||"); NL;
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%2s");
+        switch (input[0]) {
+            case '0':
+                return;
+                break;
+            case '1':
+                break;
+        }
     }
 }

@@ -43,6 +43,9 @@ void MainMenu() {
             case '2':
                 MenuVendor(&VendorList);
                 break;
+            case '3':
+                MenuClient(&ClientList);
+                break;
             default:
                 break;
         }

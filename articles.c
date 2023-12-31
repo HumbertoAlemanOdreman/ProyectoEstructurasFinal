@@ -33,8 +33,6 @@ void CreateArticleList(ArticleNode** list, const Article data) {
 }
 
 ArticleNode* LookForArticle(ArticleNode* list, const char code[], const char name[], const float price, const int ammount) {
-    // NULL a string to skip
-    // ZERO a value to skip
     ArticleNode* aux = list;
     ArticleNode* loop = list;
     while (loop) {
@@ -42,14 +40,14 @@ ArticleNode* LookForArticle(ArticleNode* list, const char code[], const char nam
         if (name != NULL && strcmp(loop->data.name, name)) { loop = loop->next; continue; }
         if (price != ZERO && loop->data.price != price) { loop = loop->next; continue; }
         if (ammount != ZERO && loop->data.ammount != ammount) { loop = loop->next; continue; }
-        if (aux == loop) { return list; }                                   // If aux is loop the first item is the item we're looking for
-        while (aux->next != loop) { aux = aux->next; } return aux->next;    // Else we have to find the pointer to it
+        if (aux == loop) { return list; }
+        while (aux->next != loop) { aux = aux->next; } return aux->next;
     } return NULL;
 }
 
 void PushArticle(ArticleNode** list, const Article data) {
-    if (*list == NULL) { CreateArticleList(list, data); return; }               // If list is NULL create it 
-    if (LookForArticle(*list, data.code, NULL, ZERO, ZERO) != NULL) { return; } // If code already exists don't add it
+    if (*list == NULL) { CreateArticleList(list, data); return; } 
+    if (LookForArticle(*list, data.code, NULL, ZERO, ZERO) != NULL) { return; }
     ArticleNode* head = MALLOC_ART;
     head->data = data;
     head->next = *list;
@@ -57,8 +55,8 @@ void PushArticle(ArticleNode** list, const Article data) {
 }
 
 void AppendArticle(ArticleNode** list, const Article data) {
-    if (*list == NULL) { CreateArticleList(list, data); return; }               // If list is NULL create it 
-    if (LookForArticle(*list, data.code, NULL, ZERO, ZERO) != NULL) { return; } // If code already exists don't add it
+    if (*list == NULL) { CreateArticleList(list, data); return; } 
+    if (LookForArticle(*list, data.code, NULL, ZERO, ZERO) != NULL) { return; }
     ArticleNode* loop = *list;
     while(loop->next) { loop = loop->next; }
     loop->next = MALLOC_ART;
@@ -78,8 +76,7 @@ void InsertArticle(ArticleNode** list, const Article data, int position) {
     loop->next->data = data;
 }
 
-ArticleNode* PreviousArticle(ArticleNode *list, ArticleNode *article)
-{
+ArticleNode* PreviousArticle(ArticleNode *list, ArticleNode *article) {
   if (list == NULL) { return NULL; }
   if (list == article) { return NULL; }
   while (list->next != NULL) {
@@ -89,8 +86,6 @@ ArticleNode* PreviousArticle(ArticleNode *list, ArticleNode *article)
 };
 
 ArticleNode* LookForArticles(ArticleNode* list, const char code[], const char name[], const float price, const int ammount) {
-    // NULL a string to skip
-    // ZERO a value to skip
     ArticleNode* loop = list;
     ArticleNode* ret = NULL;
     while (loop) {
@@ -112,17 +107,17 @@ void PrintSingleArticle(Article list) {
     TAB; printf("=================================================="); NL;
 }
 
-void PrintArticleList(struct ArticleNode *list) {
+void PrintArticleList(ArticleNode *list) {
     char tmp[4];
     if (list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); }
-    struct ArticleNode* articulo_inicial = list;
-    struct ArticleNode* aux = list;
+    ArticleNode* nodo_inicial = list;
+    ArticleNode* aux = list;
 
     while (list != NULL) {
         CLEAR;
         PrintSingleArticle(list->data);
         printf("\n");
-        if (PreviousArticle(articulo_inicial, list) != NULL) { TAB; printf("[P] Articulo Previo\n"); }
+        if (PreviousArticle(nodo_inicial, list) != NULL) { TAB; printf("[P] Articulo Previo\n"); }
         if (list->next != NULL) { TAB; printf("[S] Articulo Siguiente\n"); }
         TAB; printf("[T] Terminar Visualizacion\n");
         InputString(tmp, "%2s");
@@ -138,7 +133,7 @@ void PrintArticleList(struct ArticleNode *list) {
             break;
         case 'P':
         case 'p':
-            aux = PreviousArticle(articulo_inicial, list);
+            aux = PreviousArticle(nodo_inicial, list);
             if (aux != NULL) { list = aux; }
             break;
         }
@@ -147,7 +142,7 @@ void PrintArticleList(struct ArticleNode *list) {
 
 void ReadFileArticle(ArticleNode** list, const char dir[]) {
     FILE *f; f = fopen(dir, "r");
-    if (f == NULL) { return; }           // If file is NULL return
+    if (f == NULL) { return; }
     Article aux;
     while (1) {
         if (fscanf(f, "%s", aux.code) == EOF) { break; }
@@ -160,8 +155,8 @@ void ReadFileArticle(ArticleNode** list, const char dir[]) {
 
 void SaveFileArticle(ArticleNode* list, const char dir[]) {
     FILE *f; f = fopen(dir, "w");
-    if (f == NULL) { fclose(f); return; }           // If file is NULL return
-    if (list == NULL) { fprintf(f, ""); return; }   // If list is NULL return 
+    if (f == NULL) { fclose(f); return; }
+    if (list == NULL) { fprintf(f, ""); return; } 
     ArticleNode* aux = list;
     while (aux) {
         fprintf(f, "%s ", aux->data.code);
@@ -172,7 +167,6 @@ void SaveFileArticle(ArticleNode* list, const char dir[]) {
         aux = aux->next;
     } fclose(f);
 }
-
 
 int GetPositionArticle(ArticleNode* list, ArticleNode* data) {
     if (list == NULL || data == NULL || list == data) { return 0; }
@@ -363,10 +357,8 @@ void MenuArticle(ArticleNode** list) {
                 return;
                 break;
             case '1':
-                // Create Article
                 aux = InputCreateArticle();
                 if (LookForArticle(*list, aux.code, NULL, ZERO, ZERO) != NULL) {
-                    // TODO: Agregar opcion para modificarlo
                     TAB; printf("El articulo ya se encuentra dentro de la lista"); NL;
                     break;
                 }

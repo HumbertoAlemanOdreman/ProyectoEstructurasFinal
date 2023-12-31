@@ -17,14 +17,11 @@ typedef struct ClientNode {
 } ClientNode;
 #endif
 
-Client CreateClient(const char name[], const char ci[], const char address[], const char cellphone[]);
-void CreateClientList(ClientNode** list, const Client data);
-ClientNode* LookForClient(ClientNode* list, const char name[], const char ci[], const char address[], const char cellphone[]);
-void PushClient(ClientNode** list, const Client data);
+Client InputCreateClient();
 void AppendClient(ClientNode** list, const Client data);
-void InsertClient(ClientNode** list, const Client data, int position);
-ClientNode* LookForClients(ClientNode* list, const char name[], const char ci[], const char address[], const char cellphone[]);
-void PrintSingleClient(const ClientNode* list);
-void PrintClientList(ClientNode* list);
+ClientNode* GetClientFromPosition(ClientNode** list, int position);
+ClientNode* LookForClient(ClientNode* list, const char name[], const char ci[], const char address[], const char cellphone[]);
+ClientNode* SearchClient(ClientNode* list, int single);
 void ReadFileClient(ClientNode** list, const char dir[]);
 void SaveFileClient(ClientNode* list, const char dir[]);
+void MenuClient(ClientNode** list);

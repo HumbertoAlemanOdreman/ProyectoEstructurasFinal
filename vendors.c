@@ -36,8 +36,6 @@ void CreateVendorList(VendorNode** list, const Vendor data) {
 }
 
 VendorNode* LookForVendor(VendorNode* list, const char name[], const char ci[], const Date date, const float commission) {
-    // NULL a string to skip
-    // ZERO a value to skip
     VendorNode* aux = list;
     VendorNode* loop = list;
     while (loop) {
@@ -47,14 +45,14 @@ VendorNode* LookForVendor(VendorNode* list, const char name[], const char ci[], 
         if (date.month != ZERO && loop->data.date.month != date.month) { loop = loop->next; continue; }
         if (date.year != ZERO && loop->data.date.year != date.year) { loop = loop->next; continue; }
         if (commission != ZERO && loop->data.commission != commission) { loop = loop->next; continue; }
-        if (aux == loop) { return list; }                                   // If aux is loop the first item is the item we're looking for
-        while (aux->next != loop) { aux = aux->next; } return aux->next;    // Else we have to find the pointer to it
+        if (aux == loop) { return list; }
+        while (aux->next != loop) { aux = aux->next; } return aux->next;
     } return NULL;
 }
 
 void PushVendor(VendorNode** list, const Vendor data) {
-    if (*list == NULL) { CreateVendorList(list, data); return; }               // If list is NULL create it 
-    if (LookForVendor(*list, NULL, data.ci, NULL_DATE, ZERO) != NULL) { return; }   // If ci already exists don't add it
+    if (*list == NULL) { CreateVendorList(list, data); return; }
+    if (LookForVendor(*list, NULL, data.ci, NULL_DATE, ZERO) != NULL) { return; }
     VendorNode* head = MALLOC_VEN;
     head->data = data;
     head->next = *list;
@@ -62,8 +60,8 @@ void PushVendor(VendorNode** list, const Vendor data) {
 }
 
 void AppendVendor(VendorNode** list, const Vendor data) {
-    if (*list == NULL) { CreateVendorList(list, data); return; }               // If list is NULL create it 
-    if (LookForVendor(*list, NULL, data.ci, NULL_DATE, ZERO) != NULL) { return; }   // If ci already exists don't add it
+    if (*list == NULL) { CreateVendorList(list, data); return; } 
+    if (LookForVendor(*list, NULL, data.ci, NULL_DATE, ZERO) != NULL) { return; }
     VendorNode* loop = *list;
     while(loop->next) { loop = loop->next; }
     loop->next = MALLOC_VEN;
@@ -83,18 +81,16 @@ void InsertVendor(VendorNode** list, const Vendor data, int position) {
     loop->next->data = data;
 }
 
-VendorNode* PreviousVendor(VendorNode *list, VendorNode *article) {
+VendorNode* PreviousVendor(VendorNode *list, VendorNode *vendor) {
   if (list == NULL) { return NULL; }
-  if (list == article) { return NULL; }
+  if (list == vendor) { return NULL; }
   while (list->next != NULL) {
-    if (list->next == article) { return list; }
+    if (list->next == vendor) { return list; }
     list = list->next;
   } return NULL;
 }
 
 VendorNode* LookForVendors(VendorNode* list, const char name[], const char ci[], const Date date, const float commission) {
-    // NULL a string to skip
-    // ZERO a value to skip
     VendorNode* loop = list;
     VendorNode* ret = NULL;
     while (loop) {
@@ -112,8 +108,8 @@ void PrintSingleVendor(Vendor list) {
     TAB; printf("=================================================="); NL;
     TAB; printf("|| Nombre: %35s ||", list.name); NL;
     TAB; printf("=================================================="); NL;
-    TAB; printf("|| Codigo: %35s ||", list.ci); NL;
-    TAB; printf("|| Precio: %2d/%2d/%4d                          ||", list.date.day, list.date.month, list.date.year); NL;
+    TAB; printf("|| Cedula: %35s ||", list.ci); NL;
+    TAB; printf("|| Fecha: %2d/%2d/%4d                           ||", list.date.day, list.date.month, list.date.year); NL;
     TAB; printf("|| Comision: %33f ||", list.commission); NL;
     TAB; printf("|| Ganancias: %32f ||", list.totalEarned); NL;
     TAB; printf("=================================================="); NL;
@@ -154,7 +150,7 @@ void PrintVendorList(struct VendorNode* list) {
 
 void ReadFileVendor(VendorNode** list, const char dir[]) {
     FILE *f; f = fopen(dir, "r");
-    if (f == NULL) { return; }           // If file is NULL return
+    if (f == NULL) { return; }
     Vendor aux;
     while (1) {
         if (fscanf(f, "%s", aux.name) == EOF) { break; }
@@ -168,8 +164,8 @@ void ReadFileVendor(VendorNode** list, const char dir[]) {
 
 void SaveFileVendor(VendorNode* list, const char dir[]) {
     FILE *f; f = fopen(dir, "w");
-    if (f == NULL) { fclose(f); return; }           // If file is NULL return
-    if (list == NULL) { fprintf(f, ""); return; }   // If list is NULL return 
+    if (f == NULL) { fclose(f); return; }
+    if (list == NULL) { fprintf(f, ""); return; }
     VendorNode* aux = list;
     while (aux) {
         fprintf(f, "%s ", aux->data.name);
@@ -417,18 +413,16 @@ void MenuVendor(VendorNode** list) {
                 return;
                 break;
             case '1':
-                // Create Article
                 aux = InputCreateVendor();
                 if (LookForVendor(*list, aux.ci, NULL, NULL_DATE, ZERO) != NULL) {
-                    // TODO: Agregar opcion para modificarlo
-                    TAB; printf("El articulo ya se encuentra dentro de la lista"); NL;
+                    TAB; printf("El Vendedor ya se encuentra dentro de la lista"); NL;
                     break;
                 }
 
                 while (1) {
                     CLEAR;
                     PrintSingleVendor(aux); NL;
-                    TAB; printf("Ingrese la posicion donde agregar el articulo: "); NL;
+                    TAB; printf("Ingrese la posicion donde agregar el Vendedor: "); NL;
                     TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
                     TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
                     TAB; printf("Posicion: "); InputString(input, "%10s");
@@ -438,19 +432,19 @@ void MenuVendor(VendorNode** list) {
                 }
 
                 InsertVendor(list, aux, posicion);
-                SaveFileVendor(*list, "Articulos.txt");
+                SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '2':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
                 while (1) {
                     CLEAR;
                     TAB; printf("=================================================="); NL;
-                    TAB; printf("|| Menu Remover Articulo                        ||"); NL;
+                    TAB; printf("|| Menu Remover Vendedor                        ||"); NL;
                     TAB; printf("=================================================="); NL;
                     TAB; printf("|| 1. Remover por Posicion                      ||"); NL;
                     TAB; printf("|| 2. Remover por Campo                         ||"); NL;
                     TAB; printf("||                                              ||"); NL;
-                    TAB; printf("|| 0. Regresar al Menu de Articulos             ||"); NL;
+                    TAB; printf("|| 0. Regresar al Menu de Vendedores            ||"); NL;
                     TAB; printf("=================================================="); NL;
                     NL;
                     TAB; printf("Seleccion: "); InputString(input, "%2s");
@@ -458,7 +452,7 @@ void MenuVendor(VendorNode** list) {
                     if (atoi(input) == 1) {
                         while (1) {
                             CLEAR;
-                            TAB; printf("Ingrese la posicion donde eliminar el articulo: "); NL;
+                            TAB; printf("Ingrese la posicion donde Eliminar el Vendedor: "); NL;
                             TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
                             TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
                             TAB; printf("Posicion: "); InputString(input, "%10s");
@@ -486,12 +480,13 @@ void MenuVendor(VendorNode** list) {
                         break;
                     }
                 }
+                SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '3':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
                 while (1) {
                     CLEAR;
-                    TAB; printf("Ingrese la posicion a modificar el articulo: "); NL;
+                    TAB; printf("Ingrese la posicion a modificar el Vendedor: "); NL;
                     TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
                     TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
                     TAB; printf("Posicion: "); InputString(input, "%10s");
@@ -500,6 +495,7 @@ void MenuVendor(VendorNode** list) {
                     if (!strcmp(input, "Final")) { posicion = LAST; break; }
                 }
                 ModifyVendor(GetVendorFromPosition(list, posicion));
+                SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '4':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
