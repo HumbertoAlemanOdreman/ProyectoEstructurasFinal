@@ -148,6 +148,39 @@ void PrintVendorList(struct VendorNode* list) {
     }
 };
 
+VendorNode* SelectVendorFromList(struct VendorNode* list) {
+    char tmp[4];
+    if (list == NULL) { return NULL; }
+    struct VendorNode* nodo_inicial = list;
+    struct VendorNode* aux = list;
+
+    while (list != NULL) {
+        CLEAR;
+        PrintSingleVendor(list->data);
+        printf("\n");
+        if (PreviousVendor(nodo_inicial, list) != NULL) { TAB; printf("[P] Vendedor Previo\n"); }
+        if (list->next != NULL) { TAB; printf("[S] Vendedor Siguiente\n"); }
+        TAB; printf("[T] Seleccionar Elemento\n");
+        InputString(tmp, "%2s");
+        switch (tmp[0]) {
+            case 'T':
+            case 't':
+            return list;
+            break;
+        case 'S':
+        case 's':
+            if (list->next == NULL) { break; }
+            list = list->next;
+            break;
+        case 'P':
+        case 'p':
+            aux = PreviousVendor(nodo_inicial, list);
+            if (aux != NULL) { list = aux; }
+            break;
+        }
+    } return NULL;
+};
+
 void ReadFileVendor(VendorNode** list, const char dir[]) {
     FILE *f; f = fopen(dir, "r");
     if (f == NULL) { return; }
@@ -388,6 +421,56 @@ void ModifyVendor(VendorNode* list) {
     } list->data.commission = strcmp(input, "0") ? atoi(input) : list->data.commission;
 }
 
+VendorNode* MenuVendorSelection(VendorNode** list) {
+    char input[256];
+    VendorNode* aux_node;
+    while (1) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Seleccione una Modalidad                     ||"); NL;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| 1. Seleccionar por posicion en la lista      ||"); NL;
+        TAB; printf("|| 2. Seleccionar por busqueda de campos        ||"); NL;
+        TAB; printf("|| 3. Seleccionar con interfaz grafica          ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Regresar al Menu Principal                ||"); NL;
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%2s");
+        if (input[0] == '0') { return NULL; }
+        if (input[0] == '1') {
+            while (1) {
+                CLEAR;
+                TAB; printf("=================================================="); NL;
+                TAB; printf("|| Ingrese la posicion del Vendedor             ||"); NL;
+                TAB; printf("=================================================="); NL;
+                TAB; printf("|| 'Inicio' para seleccionar la primera         ||"); NL;
+                TAB; printf("|| 'Final' para seleccionar la ultima           ||"); NL;
+                TAB; printf("|| 'Numero' Para seleccionar la X posicion      ||"); NL;
+                TAB; printf("||                                              ||"); NL;
+                TAB; printf("|| 0. Seleccionar de otra manera                ||"); NL;
+                TAB; printf("=================================================="); NL;
+                NL;
+                TAB; printf("Posicion: "); InputString(input, "%10s");
+                if (input[0] == '0') { break; }
+                if (!strcmp(input, "Inicio")) { return GetVendorFromPosition(list, ZERO); }
+                if (!strcmp(input, "Final")) { return GetVendorFromPosition(list, LAST); }
+                if (atoi(input) > 0) { return GetVendorFromPosition(list, atoi(input)); }
+            }
+        }
+        if (input[0] == '2') {
+            aux_node =  SearchVendor(*list, 1);
+            if (aux_node == NULL) { NL; TAB; printf("No se ha encontrado el elemento"); NL; getchar(); continue; }
+            return aux_node;
+        }
+        if (input[0] == '3') {
+            aux_node = SelectVendorFromList(*list);
+            if (aux_node == NULL) { NL; TAB; printf("No se ha encontrado el elemento"); NL; getchar(); continue; }
+            return aux_node;
+        }
+    } return NULL;
+}
+
 void MenuVendor(VendorNode** list) {
     char input[256];
     int posicion;
@@ -396,7 +479,7 @@ void MenuVendor(VendorNode** list) {
     while (1) {
         CLEAR;
         TAB; printf("=================================================="); NL;
-        TAB; printf("|| Menu Manejo Vendedores                       ||"); NL;
+        TAB; printf("|| Menu Manejo Vendedores                        ||"); NL;
         TAB; printf("=================================================="); NL;
         TAB; printf("|| 1. Agregar un Vendedor                       ||"); NL;
         TAB; printf("|| 2. Remover un Vendedor                       ||"); NL;
@@ -414,17 +497,23 @@ void MenuVendor(VendorNode** list) {
                 break;
             case '1':
                 aux = InputCreateVendor();
-                if (LookForVendor(*list, aux.ci, NULL, NULL_DATE, ZERO) != NULL) {
-                    TAB; printf("El Vendedor ya se encuentra dentro de la lista"); NL;
+                if (LookForVendor(*list, NULL, aux.ci, NULL_DATE, ZERO) != NULL) {
+                    TAB; printf("El articulo ya se encuentra dentro de la lista"); NL;
                     break;
                 }
 
                 while (1) {
                     CLEAR;
-                    PrintSingleVendor(aux); NL;
-                    TAB; printf("Ingrese la posicion donde agregar el Vendedor: "); NL;
-                    TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
-                    TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Ingrese la posicion del Vendedor             ||"); NL;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| 'Inicio' para seleccionar la primera         ||"); NL;
+                    TAB; printf("|| 'Final' para seleccionar la ultima           ||"); NL;
+                    TAB; printf("|| 'Numero' Para seleccionar la X posicion      ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| 0. Seleccionar de otra manera                ||"); NL;
+                    TAB; printf("=================================================="); NL;
+                    NL;
                     TAB; printf("Posicion: "); InputString(input, "%10s");
                     if (atoi(input) > 0) { posicion = atoi(input); break; }
                     if (!strcmp(input, "Inicio")) { posicion =  ZERO; break; }
@@ -436,70 +525,43 @@ void MenuVendor(VendorNode** list) {
                 break;
             case '2':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
+                aux_node = MenuVendorSelection(list);
+                if (aux_node == NULL) { break; }
                 while (1) {
                     CLEAR;
-                    TAB; printf("=================================================="); NL;
-                    TAB; printf("|| Menu Remover Vendedor                        ||"); NL;
-                    TAB; printf("=================================================="); NL;
-                    TAB; printf("|| 1. Remover por Posicion                      ||"); NL;
-                    TAB; printf("|| 2. Remover por Campo                         ||"); NL;
-                    TAB; printf("||                                              ||"); NL;
-                    TAB; printf("|| 0. Regresar al Menu de Vendedores            ||"); NL;
-                    TAB; printf("=================================================="); NL;
+                    PrintSingleVendor(aux_node->data);
+                    NL;
+                    TAB; printf("1. Eliminar de la lista"); NL;
+                    TAB; printf("0. No eliminar de la lista"); NL;
                     NL;
                     TAB; printf("Seleccion: "); InputString(input, "%2s");
-                    if (atoi(input) == 0) { break; }
-                    if (atoi(input) == 1) {
-                        while (1) {
-                            CLEAR;
-                            TAB; printf("Ingrese la posicion donde Eliminar el Vendedor: "); NL;
-                            TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
-                            TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
-                            TAB; printf("Posicion: "); InputString(input, "%10s");
-                            if (atoi(input) > 0) { posicion = atoi(input); break; }
-                            if (!strcmp(input, "Inicio")) { posicion =  ZERO; break; }
-                            if (!strcmp(input, "Final")) { posicion = LAST; break; }
-                        }
-                        while (1) {
-                            CLEAR;
-                            PrintSingleVendor(GetVendorFromPosition(list, posicion)->data);
-                            NL;
-                            TAB; printf("Desea Eliminar este elemento?: "); NL;
-                            TAB; printf("1. Si"); NL;
-                            TAB; printf("0. No"); NL; NL;
-                            TAB; printf("Seleccion: "); InputString(input, "%10s");
-                            if (atoi(input) == 1) { RemovePositionVendor(list, posicion); break; }
-                            if (atoi(input) == 0) { break; }
-                        }
-                        break;
-                    }
-                    if (atoi(input) == 2) {
-                        aux_node = SearchVendor(*list, 1);
-                        if (aux_node == NULL) { break; }
-                        RemovePositionVendor(list, GetPositionVendor(*list, aux_node));
-                        break;
-                    }
-                }
+                    if (input[0] == '0' || input[0] == '1') { break; }
+                } if (input[0] == '0') { break; }
+                RemovePositionVendor(list, GetPositionVendor(*list, aux_node));
                 SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '3':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
+                aux_node = MenuVendorSelection(list);
+                if (aux_node == NULL) { break; }
                 while (1) {
                     CLEAR;
-                    TAB; printf("Ingrese la posicion a modificar el Vendedor: "); NL;
-                    TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
-                    TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
-                    TAB; printf("Posicion: "); InputString(input, "%10s");
-                    if (atoi(input) > 0) { posicion = atoi(input); break; }
-                    if (!strcmp(input, "Inicio")) { posicion =  ZERO; break; }
-                    if (!strcmp(input, "Final")) { posicion = LAST; break; }
-                }
-                ModifyVendor(GetVendorFromPosition(list, posicion));
+                    PrintSingleVendor(aux_node->data);
+                    NL;
+                    TAB; printf("1. Modificar"); NL;
+                    TAB; printf("0. No Modificar"); NL;
+                    NL;
+                    TAB; printf("Seleccion: "); InputString(input, "%2s");
+                    if (input[0] == '0' || input[0] == '1') { break; }
+                } if (input[0] == '0') { break; }
+                ModifyVendor(aux_node);
                 SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '4':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
-                PrintVendorList(SearchVendor(*list, 0));
+                aux_node = SearchVendor(*list, 0);
+                if (aux_node == NULL) { TAB; printf("No se ha encontrado ningun elemento con esas caracteristicas"); NL; getchar(); }
+                PrintVendorList(aux_node);
                 break;
             case '5':
                 if (*list == NULL) { TAB; printf("Lista esta vacia\n"); getchar(); break; }
@@ -508,4 +570,3 @@ void MenuVendor(VendorNode** list) {
         }
     }
 }
-

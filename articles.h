@@ -18,5 +18,7 @@ typedef struct ArticleNode {
 #endif
 
 void MenuArticle(ArticleNode** list);
+ArticleNode* MenuArticleSelection(ArticleNode** list);
+ArticleNode* SearchArticle(ArticleNode* list, int single);
 void ReadFileArticle(ArticleNode**, const char dir[]);
 void SaveFileArticle(ArticleNode*, const char dir[]);

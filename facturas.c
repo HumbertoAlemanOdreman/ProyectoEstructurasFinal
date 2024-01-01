@@ -57,57 +57,121 @@ int GetMaxNum(FacturaNode* list) {
     } return ++max;
 }
 
-void CreateFacturaList(FacturaNode** list, ClientNode* client) {
+void CreateFacturaList(FacturaNode** list, Factura data) {
     if (*list != NULL) { return; }
     (*list) = MALLOC_FAC;
-    (*list)->data.Total = 0;
-    (*list)->data.Number = 0;
-    (*list)->data.Client = client;
-    (*list)->data.RenglonList = NULL;
+    (*list)->data = data;
     (*list)->next = NULL;
 }
 
-void PushFactura(FacturaNode** list, const Factura data) {
-    if (*list == NULL) { CreateFacturaList(list, data.Client); return; }               // If list is NULL create it 
+void PushFactura(FacturaNode** list, Factura data) {
+    if (*list == NULL) { CreateFacturaList(list, data); return; }               // If list is NULL create it 
     FacturaNode* head = MALLOC_FAC;
     head->data = data;
     head->next = *list;
     *list = head;
 }
 
-
-// This functions generates a Renglon to be later added to a list to then be added to the Factura
-void BuyItem(FacturaNode** list, ArticleNode* article, VendorNode* vendor, const int ammount, const int sale) {
+void BuyItem(Factura* fac, ArticleNode** articleList, VendorNode** vendorList) {
     Renglon ret;
+    char input[256];
+    int ammount; int sale;
+    ArticleNode* article; VendorNode* vendor;
 
-    // We test if there's enough items to buy, if there aren't don't buy
+    CLEAR;
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Seleccione un articulo para comprar          ||"); NL;
+    TAB; printf("||                                              ||"); NL;
+    TAB; printf("|| ENTER para continuar                         ||"); NL;
+    TAB; printf("=================================================="); NL; 
+    NL; getchar(); article = MenuArticleSelection(articleList);
+    if (article->data.ammount == 0) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| No se encuentra disponible ese articulo      ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| ENTER para continuar                         ||"); NL;
+        TAB; printf("=================================================="); NL; 
+        NL; getchar();
+        return;
+    }
+    if (article == NULL) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Fallo o se cancelo la seleccion del articulo ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| ENTER para continuar                         ||"); NL;
+        TAB; printf("=================================================="); NL; 
+        NL; getchar();
+        return;
+    } ret.art = article;
+
+    CLEAR;
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Seleccione un vendedor para comprar          ||"); NL;
+    TAB; printf("||                                              ||"); NL;
+    TAB; printf("|| ENTER para continuar                         ||"); NL;
+    TAB; printf("=================================================="); NL; 
+    NL; getchar(); vendor = MenuVendorSelection(vendorList);
+    if (vendor == NULL) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Fallo o se cancelo la seleccion del vendedor ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| ENTER para continuar                         ||"); NL;
+        TAB; printf("=================================================="); NL; 
+        NL; getchar();
+        return;
+    } ret.ven = vendor;
+
+    while (1) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Ingrese Articulos a comprar (Maximo %d)      ||", article->data.ammount); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| Presione 0 para no cancelar la compra        ||"); NL;
+        TAB; printf("=================================================="); NL; 
+        NL;
+        TAB; printf("Cantidad: "); InputString(input, "%10s");
+        if (input[0] == '0') { return; }
+        ammount = atoi(input);
+        break;
+    } 
     if (ammount > article->data.ammount) { return; }
     article->data.ammount -= ammount;
 
+    while (1) {
+        CLEAR;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Ingrese el Descuento que recibio             ||"); NL;
+        TAB; printf("=================================================="); NL; 
+        NL;
+        TAB; printf("Descuento: "); InputString(input, "%10s");
+        sale = atoi(input);
+        break;
+    } 
     // Make the sale
     ret.Sale = sale;
     ret.Ammount = ammount;
-    ret.SubTotal = ret.Ammount * article->data.price * ret.Sale;
+    ret.SubTotal = ret.Ammount * article->data.price * ((100 - ret.Sale) / 100);
     vendor->data.totalEarned += ret.SubTotal * (vendor->data.commission / 100.0f);
 
-    // Add metadata to the sale
-    if (article == NULL) { return; } ret.art = article;
-    if (vendor == NULL) { return; } ret.ven = vendor;
-
     // Add renglon to renglon list
-    PushRenglon(&(*list)->data.RenglonList, ret);
-    (*list)->data.Total += ret.SubTotal;
+    PushRenglon(&(*fac).RenglonList, ret);
+    (*fac).Total += ret.SubTotal;
 }
 
 void PrintSingleRenglon(RenglonNode* list) {
     if (list == NULL) { printf("Renglon is NULL\n"); }
-    printf("Renglon:\n");
-    printf("Article: %s\n", list->data.art->data.name);
-    printf("Vendor: %s\n", list->data.ven->data.name);
-    printf("Ammount: %d\n", list->data.Ammount);
-    printf("Sale: %f\n", list->data.Sale);
-    printf("Subtotal: %f\n", list->data.SubTotal);
-
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Renglon:                                     ||"); NL;
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Article: %34s ||", list->data.art->data.name); NL;
+    TAB; printf("|| Vendedor: %33s ||", list->data.ven->data.name); NL;
+    TAB; printf("|| Cantidad: %33d ||", list->data.Ammount); NL;
+    TAB; printf("|| Descuento: %32f ||", list->data.Sale); NL;
+    TAB; printf("|| Subtotal: %33f ||", list->data.SubTotal); NL;
+    TAB; printf("=================================================="); NL;
 }
 
 void PrintRenglonList(RenglonNode* list) {
@@ -118,67 +182,30 @@ void PrintRenglonList(RenglonNode* list) {
     }
 }
 
-void PrintSingleFactura(FacturaNode* list) {
-    if (list == NULL) { printf("Article is NULL\n"); }
-    printf("Factura:\n");
-    printf("Client: %s\n", list->data.Client->data.name);
-    printf("Number: %d\n", list->data.Number);
-    printf("Total: %d\n", list->data.Total);
-    printf("\n");
-    PrintRenglonList(list->data.RenglonList);
+void PrintSingleFactura(Factura data) {
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Factura:                                     ||"); NL;
+    TAB; printf("=================================================="); NL;
+    TAB; printf("|| Cliente: %34s ||", data.Client->data.name); NL;
+    TAB; printf("|| Numero: %35d ||", data.Number); NL;
+    TAB; printf("|| Total: %36d ||", data.Total); NL;
+    TAB; printf("=================================================="); NL;
+    PrintRenglonList(data.RenglonList);
 }
 
 void PrintFacturaList(FacturaNode* list) {
     if (list == NULL) { printf("List is NULL\n"); }
     while (list) { 
-        PrintSingleFactura(list);
+        PrintSingleFactura(list->data);
         list = list->next;
     }
 }
 
-ClientNode* GetBuyerClient(ClientNode** list) {
-    char input[256]; int position;
-    Client aux;
-    while (1) {
-        TAB; printf("=================================================="); NL;
-        TAB; printf("|| Que cliente esta comprando?                  ||"); NL;
-        TAB; printf("||                                              ||"); NL;
-        TAB; printf("|| 1. Crear un cliente                          ||"); NL;
-        TAB; printf("|| 2. Seleccionar cliente por posisicion        ||"); NL;
-        TAB; printf("|| 3. Seleccionar cliente por campo             ||"); NL;
-        TAB; printf("||                                              ||"); NL;
-        TAB; printf("|| 0. Regresar al menu de Facturas              ||");
-        TAB; printf("=================================================="); NL;
-        NL;
-        TAB; printf("Seleccion: "); InputString(input, "%3s");
-
-        if (input[0] == '0') { return NULL; }
-        if (input[0] == '1') {
-            aux = InputCreateClient();
-            if (LookForClient(*list, NULL, aux.ci, ZERO, ZERO) != NULL) {
-                TAB; printf("El Cliente ya se encuentra dentro de la lista"); NL;
-                return NULL;
-            } AppendClient(list, aux);
-        }
-        if (input[0] == '2') {
-            while (1) {
-                CLEAR;
-                TAB; printf("Ingrese la posicion donde Eliminar el Cliente: "); NL;
-                TAB; printf("'Inicio' para seleccionar la primera posicion"); NL;
-                TAB; printf("'Final' para seleccionar la ultima posicion"); NL; NL;
-                TAB; printf("Posicion: "); InputString(input, "%10s");
-                if (atoi(input) > 0) { position = atoi(input); break; }
-                if (!strcmp(input, "Inicio")) { position =  ZERO; break; }
-                if (!strcmp(input, "Final")) { position = LAST; break; }
-            } return GetClientFromPosition(list, position);
-        }
-        if (input[0] == '3') { return SearchClient(*list, 1); }
-    } return NULL;
-}
-
-void MenuArticle(ArticleNode** list) {
+void MenuFactura(FacturaNode** list, ArticleNode** articleList, VendorNode** vendorList, ClientNode** clientList) {
     char input[256];
     int posicion;
+    Factura aux; 
+    ClientNode* cliAux;
     while (1) {
         CLEAR;
         TAB; printf("=================================================="); NL;
@@ -199,6 +226,50 @@ void MenuArticle(ArticleNode** list) {
                 return;
                 break;
             case '1':
+                CLEAR;
+                TAB; printf("=================================================="); NL;
+                TAB; printf("|| Seleccione el cliente que realizara la compra||"); NL;
+                TAB; printf("||                                              ||"); NL;
+                TAB; printf("|| ENTER para continuar                         ||"); NL;
+                TAB; printf("=================================================="); NL; 
+                NL; getchar(); cliAux = MenuClientSelection(clientList);
+                if (cliAux == NULL) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Fallo o se cancelo la seleccion del cliente  ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } 
+                aux.Client = cliAux;
+                aux.RenglonList = NULL;
+                aux.Number = GetMaxNum(*list);
+                aux.Total = 0;
+                while (1) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Desea comprar un Articulo?                   ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| 1. Comprar nuevo Articulo                    ||"); NL;
+                    TAB; printf("|| 0. Terminar la Factura                       ||"); NL   ;
+                    TAB; printf("=================================================="); NL;
+                    NL;
+                    TAB; printf("Seleccion: "); InputString(input, "%3s");
+                    if (input[0] == '1') { 
+                        BuyItem(&aux, articleList, vendorList);
+                    }
+                    if (input[0] == '0') { break; }
+                }
+                SaveFileArticle(*articleList, "Articulos.txt");
+                SaveFileVendor(*vendorList, "Vendedores.txt");
+                PushFactura(list, aux);
+                PrintSingleFactura(aux); getchar();
+                break;
+            case '5':
+                PrintFacturaList(*list);
+                getchar();
                 break;
         }
     }

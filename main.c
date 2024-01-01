@@ -8,7 +8,7 @@
 #include "definitions.h"
 #include "input.h"
 
-#include "Facturas.c"
+#include "facturas.c"
 
 ArticleNode* ArticleList = NULL;
 VendorNode* VendorList = NULL;
@@ -26,7 +26,7 @@ void MainMenu() {
         TAB; printf("=================================================="); NL;
         TAB; printf("|| 1. Manejo de Articulos                       ||"); NL;
         TAB; printf("|| 2. Manejo de Vendedores                      ||"); NL;
-        TAB; printf("|| 3. Manejo de Clients                         ||"); NL;
+        TAB; printf("|| 3. Manejo de Clientes                        ||"); NL;
         TAB; printf("|| 4. Manejo de Facturas                        ||"); NL;
         TAB; printf("||                                              ||"); NL;
         TAB; printf("|| 0. Salir del Programa                        ||"); NL;
@@ -45,6 +45,9 @@ void MainMenu() {
                 break;
             case '3':
                 MenuClient(&ClientList);
+                break;
+            case '4':
+                MenuFactura(&FacturaList, &ArticleList, &VendorList, &ClientList);
                 break;
             default:
                 break;

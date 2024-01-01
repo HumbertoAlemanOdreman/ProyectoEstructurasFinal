@@ -23,5 +23,7 @@ typedef struct VendorNode {
 #endif
 
 void MenuVendor(VendorNode** list);
+VendorNode* MenuVendorSelection(VendorNode** list);
+VendorNode* SearchVendor(VendorNode* list, int single);
 void ReadFileVendor(VendorNode** list, const char dir[]);
 void SaveFileVendor(VendorNode* list, const char dir[]);
