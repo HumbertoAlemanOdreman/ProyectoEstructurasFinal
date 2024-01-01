@@ -1,6 +1,4 @@
-#ifndef COL_SIZE
-#define COL_SIZE 30
-#endif
+#include "definitions.h"
 
 #ifndef _ARTICLES_H
 #define _ARTICLES_H
@@ -17,8 +15,24 @@ typedef struct ArticleNode {
 } ArticleNode;
 #endif
 
-void MenuArticle(ArticleNode** list);
-ArticleNode* MenuArticleSelection(ArticleNode** list);
+Article CreateArticle(const char code[], const char name[], const float price, const int ammount);
+void CreateArticleList(ArticleNode** list, const Article data);
+ArticleNode* LookForArticle(ArticleNode* list, const char code[], const char name[], const float price, const int ammount);
+void PushArticle(ArticleNode** list, const Article data);
+void AppendArticle(ArticleNode** list, const Article data);
+void InsertArticle(ArticleNode** list, const Article data, int position);
+ArticleNode* PreviousArticle(ArticleNode *list, ArticleNode *article);
+ArticleNode* LookForArticles(ArticleNode* list, const char code[], const char name[], const float price, const int ammount);
+void PrintSingleArticle(Article list);
+void PrintArticleList(ArticleNode *list);
+ArticleNode* SelectArticleFromList(ArticleNode *list);
+void ReadFileArticle(ArticleNode** list, const char dir[]);
+void SaveFileArticle(ArticleNode* list, const char dir[]);
+int GetPositionArticle(ArticleNode* list, ArticleNode* data);
+ArticleNode* GetArticleFromPosition(ArticleNode** list, int position);
+void RemovePositionArticle(ArticleNode** list, int position);
+Article InputCreateArticle();
 ArticleNode* SearchArticle(ArticleNode* list, int single);
-void ReadFileArticle(ArticleNode**, const char dir[]);
-void SaveFileArticle(ArticleNode*, const char dir[]);
+void ModifyArticle(ArticleNode* globalList, ArticleNode* list);
+ArticleNode* MenuArticleSelection(ArticleNode** list);
+void MenuArticle(ArticleNode** list);

@@ -59,11 +59,13 @@ int main(void) {
     ReadFileArticle(&ArticleList, "Articulos.txt");
     ReadFileVendor(&VendorList, "Vendedores.txt");
     ReadFileClient(&ClientList, "Clientes.txt");
+    ReadFileFactura(&FacturaList, ArticleList, VendorList, ClientList, "Facturas.txt");
 
     MainMenu();
 
     SaveFileArticle(ArticleList, "Articulos.txt");
     SaveFileVendor(VendorList, "Vendedores.txt");
     SaveFileClient(ClientList, "Clientes.txt");
+    SaveFileFactura(FacturaList, "Facturas.txt");
     return 0;
 }

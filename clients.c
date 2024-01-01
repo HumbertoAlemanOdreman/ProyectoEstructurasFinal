@@ -328,36 +328,70 @@ ClientNode* SearchClient(ClientNode* list, int single) {
     }
 }
 
-void ModifyClient(ClientNode* list) {
+void ModifyClient(ClientNode* globalList, ClientNode* list) {
     char input[256];
-    
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
-        CLEAR;
-        PrintSingleClient(list->data); NL;
-        TAB; printf("Ingrese el nombre del Cliente (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
 
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
+    while(1) {
         CLEAR;
-        PrintSingleClient(list->data); NL;
-        TAB; printf("Ingrese la Cedula de Identidad del Cliente (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.ci, (strcmp(input, "NULL") ? input : list->data.ci));
-
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
-        CLEAR;
-        PrintSingleClient(list->data); NL;
-        TAB; printf("Ingrese el Numero de Telefono del Cliente (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.cellphone, (strcmp(input, "NULL") ? input : list->data.cellphone));
-
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
-        CLEAR;
-        PrintSingleClient(list->data); NL;
-        TAB; printf("Ingrese la Direccion del Cliente (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.address, (strcmp(input, "NULL") ? input : list->data.address));
+        PrintSingleClient(list->data);
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Seleccione el campo a modificar              ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 1. Modificar el nombre del Cliente           ||"); NL;
+        TAB; printf("|| 2. Modificar la CI del Cliente               ||"); NL;
+        TAB; printf("|| 3. Modificar el numero celular del Cliente   ||"); NL;
+        TAB; printf("|| 4. Modificar la direccion del Cliente        ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Concluir las modificaciones               ||"); NL;
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%10s");
+        switch(input[0]) {
+            case '0': return;
+            case '1':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleClient(list->data); NL;
+                    TAB; printf("Ingrese el nombre del Cliente (NULL para cancelar): "); InputString(input, "%29s");
+                } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
+                break;
+            case '2':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleClient(list->data); NL;
+                    TAB; printf("Ingrese la Cedula de Identidad del Cliente (NULL para cancelar): "); InputString(input, "%29s");
+                }
+                if (LookForClient(globalList, NULL, input, NULL, NULL) != NULL) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Ese codigo ya se encuentra en la lista       ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } strcpy(list->data.ci, (strcmp(input, "NULL") ? input : list->data.ci));
+                break;
+            case '3':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleClient(list->data); NL;
+                    TAB; printf("Ingrese el Numero de Telefono del Cliente (NULL para cancelar): "); InputString(input, "%29s");
+                } strcpy(list->data.cellphone, (strcmp(input, "NULL") ? input : list->data.cellphone));
+                break;
+            case '4':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleClient(list->data); NL;
+                    TAB; printf("Ingrese la Direccion del Cliente (NULL para cancelar): "); InputString(input, "%29s");
+                } strcpy(list->data.address, (strcmp(input, "NULL") ? input : list->data.address));
+                break;
+        }
+    }
 }
 
 ClientNode* MenuClientSelection(ClientNode** list) {
@@ -493,7 +527,7 @@ void MenuClient(ClientNode** list) {
                     TAB; printf("Seleccion: "); InputString(input, "%2s");
                     if (input[0] == '0' || input[0] == '1') { break; }
                 } if (input[0] == '0') { break; }
-                ModifyClient(aux_node);
+                ModifyClient(*list, aux_node);
                 SaveFileClient(*list, "Clientes.txt");
                 break;
             case '4':

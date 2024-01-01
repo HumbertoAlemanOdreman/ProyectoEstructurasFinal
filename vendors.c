@@ -371,54 +371,131 @@ VendorNode* SearchVendor(VendorNode* list, int single) {
 }
 
 
-void ModifyVendor(VendorNode* list) {
+void ModifyVendor(VendorNode* globalList, VendorNode* list) {
     char input[256];
-
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
+    while (1) {
         CLEAR;
         PrintSingleVendor(list->data);
-        TAB; printf("Ingrese el nuevo nombre del Vendedor (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
-
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
-        CLEAR;
-        PrintSingleVendor(list->data);
-        TAB; printf("Ingrese la nueva Cedula de Identidad del Vendedor (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.ci, (strcmp(input, "NULL") ? input : list->data.ci));
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleVendor(list->data);
-        TAB; printf("Ingrese el nuevo dia de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.date.day = strcmp(input, "0") ? atoi(input) : list->data.date.day;
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleVendor(list->data);
-        TAB; printf("Ingrese el nuevo mes de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.date.month = strcmp(input, "0") ? atoi(input) : list->data.date.month;
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleVendor(list->data);
-        TAB; printf("Ingrese el nuevo year de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.date.year = strcmp(input, "0") ? atoi(input) : list->data.date.year;
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleVendor(list->data);
-        TAB; printf("Ingrese la nueva comision del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.commission = strcmp(input, "0") ? atoi(input) : list->data.commission;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Seleccione el campo a modificar              ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 1. Modificar el nombre del Vendedor          ||"); NL;
+        TAB; printf("|| 2. Modificar la CI del Vendedor              ||"); NL;
+        TAB; printf("|| 3. Modificar el dia de ingreso del Vendedor  ||"); NL;
+        TAB; printf("|| 4. Modificar el mes de ingreso del Vendedor  ||"); NL;
+        TAB; printf("|| 5. Modificar el Anio de ingreso del Vendedor ||"); NL;
+        TAB; printf("|| 6. Modificar la comision del Vendedor        ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Concluir las modificaciones               ||"); NL;
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%10s");
+        switch(input[0]) {
+            case '0': return;
+            case '1':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese el nuevo nombre del Vendedor (NULL para cancelar): "); InputString(input, "%29s");
+                } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
+                break;
+            case '2':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese la nueva Cedula de Identidad del Vendedor (NULL para omitir): "); InputString(input, "%29s");
+                }
+                if (LookForVendor(globalList, NULL, input, NULL_DATE, ZERO)) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Esa C.I ya se encuentra en la lista          ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } strcpy(list->data.ci, (strcmp(input, "NULL") ? input : list->data.ci));
+                break;
+            case '3':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese el nuevo dia de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                }
+                if (atoi(input) < 0 || atoi(input) > 30) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| El dia de ingreso debe estar entre 0 y 30    ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.date.day = strcmp(input, "0") ? atoi(input) : list->data.date.day;
+                break;
+            case '4':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese el nuevo mes de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                }
+                if (atoi(input) < 0 || atoi(input) > 12) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| El mes de ingreso debe estar entre 0 y 12    ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.date.month = strcmp(input, "0") ? atoi(input) : list->data.date.month;
+                break;
+            case '5':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese el nuevo anio de ingreso del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                }
+                if (atoi(input) < 0) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| El anio de ingreso debe ser mayor a 0        ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.date.year = strcmp(input, "0") ? atoi(input) : list->data.date.year;
+                break;
+            case '6':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleVendor(list->data);
+                    TAB; printf("Ingrese la nueva comision del Vendedor (ZERO para omitir): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                } 
+                if (atoi(input) < 0 || atoi(input) > 100) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| La comision debe estar entre 0 y 100         ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.commission = strcmp(input, "0") ? atoi(input) : list->data.commission;
+                break;
+        }
+    }
 }
 
 VendorNode* MenuVendorSelection(VendorNode** list) {
@@ -554,7 +631,7 @@ void MenuVendor(VendorNode** list) {
                     TAB; printf("Seleccion: "); InputString(input, "%2s");
                     if (input[0] == '0' || input[0] == '1') { break; }
                 } if (input[0] == '0') { break; }
-                ModifyVendor(aux_node);
+                ModifyVendor(*list, aux_node);
                 SaveFileVendor(*list, "Vendedores.txt");
                 break;
             case '4':

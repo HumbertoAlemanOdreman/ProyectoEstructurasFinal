@@ -331,38 +331,90 @@ ArticleNode* SearchArticle(ArticleNode* list, int single) {
     }
 }
 
-void ModifyArticle(ArticleNode* list) {
+void ModifyArticle(ArticleNode* globalList, ArticleNode* list) {
     char input[256];
-
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
+    while(1) {
         CLEAR;
         PrintSingleArticle(list->data); NL;
-        TAB; printf("Ingrese el nuevo nombre del Articulo (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
-    
-    strcpy(input, "");
-    while (!strcmp(input, "")) {
-        CLEAR;
-        PrintSingleArticle(list->data); NL;
-        TAB; printf("Ingrese el nuevo codigo del Articulo (NULL para omitir): "); InputString(input, "%29s");
-    } strcpy(list->data.code, (strcmp(input, "NULL") ? input : list->data.code));
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleArticle(list->data); NL;
-        TAB; printf("Ingrese el nuevo precio del Articulo (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.price = strcmp(input, "0") ? atoi(input) : list->data.price;
-
-    strcpy(input, "");
-    while (atoi(input) <= 0) {
-        CLEAR;
-        PrintSingleArticle(list->data); NL;
-        TAB; printf("Ingrese la nuevo cantidad de stock del Articulo (ZERO para omitir): "); InputString(input, "%29s");
-        if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
-    } list->data.ammount = strcmp(input, "0") ? atoi(input) : list->data.ammount;
+        TAB; printf("=================================================="); NL;
+        TAB; printf("|| Seleccione el campo a modificar              ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 1. Modificar el nombre del Articulo          ||"); NL;
+        TAB; printf("|| 2. Modificar el codigo del Articulo          ||"); NL;
+        TAB; printf("|| 3. Modificar el precio del Articulo          ||"); NL;
+        TAB; printf("|| 4. Modificar el stock del Articulo           ||"); NL;
+        TAB; printf("||                                              ||"); NL;
+        TAB; printf("|| 0. Concluir las modificaciones               ||"); NL;
+        TAB; printf("=================================================="); NL;
+        NL;
+        TAB; printf("Seleccion: "); InputString(input, "%10s");
+        switch(input[0]) {
+            case '0': return;
+            case '1':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleArticle(list->data); NL;
+                    TAB; printf("Ingrese el nuevo nombre del Articulo (NULL para cancelar): "); InputString(input, "%29s");
+                } strcpy(list->data.name, (strcmp(input, "NULL") ? input : list->data.name));
+                break;
+            case '2':
+                strcpy(input, "");
+                while (!strcmp(input, "")) {
+                    CLEAR;
+                    PrintSingleArticle(list->data); NL;
+                    TAB; printf("Ingrese el nuevo codigo del Articulo (NULL para cancelar): "); InputString(input, "%29s");
+                }
+                if (LookForArticle(globalList, NULL, input, ZERO, ZERO != NULL)) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| Ese codigo ya se encuentra en la lista       ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } strcpy(list->data.code, (strcmp(input, "NULL") ? input : list->data.code));
+            case '3':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleArticle(list->data); NL;
+                    TAB; printf("Ingrese el nuevo precio del Articulo (ZERO para cancelar): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                }
+                if (atoi(input) < 0) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| El precio no puede ser menor a cero          ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.price = strcmp(input, "0") ? atoi(input) : list->data.price;
+                break;
+            case '4':
+                strcpy(input, "");
+                while (atoi(input) <= 0) {
+                    CLEAR;
+                    PrintSingleArticle(list->data); NL;
+                    TAB; printf("Ingrese la nuevo cantidad de stock del Articulo (ZERO para omitir): "); InputString(input, "%29s");
+                    if (!strcmp(input, "ZERO")) { strcpy(input, "0"); break; }
+                }
+                if (atoi(input) < 0) {
+                    CLEAR;
+                    TAB; printf("=================================================="); NL;
+                    TAB; printf("|| El stock no puede ser menor a cero           ||"); NL;
+                    TAB; printf("||                                              ||"); NL;
+                    TAB; printf("|| ENTER para continuar                         ||"); NL;
+                    TAB; printf("=================================================="); NL; 
+                    NL; getchar();
+                    break;
+                } list->data.ammount = strcmp(input, "0") ? atoi(input) : list->data.ammount;
+                break;
+        }
+    }
 }
 
 ArticleNode* MenuArticleSelection(ArticleNode** list) {
@@ -498,7 +550,7 @@ void MenuArticle(ArticleNode** list) {
                     TAB; printf("Seleccion: "); InputString(input, "%2s");
                     if (input[0] == '0' || input[0] == '1') { break; }
                 } if (input[0] == '0') { break; }
-                ModifyArticle(aux_node);
+                ModifyArticle(*list, aux_node);
                 SaveFileArticle(*list, "Articulos.txt");
                 break;
             case '4':
