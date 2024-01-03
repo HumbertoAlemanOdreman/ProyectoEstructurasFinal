@@ -411,7 +411,7 @@ RenglonNode* MenuRenglonSelection(RenglonNode** list, ArticleNode** articleList,
                 TAB; printf("=================================================="); NL; 
                 NL; getchar();
                 continue;
-            } return SelectRenglonFromList(aux_node);
+            } return aux_node;
         }
         if (input[0] == '3') {
             aux_article = MenuArticleSelection(articleList);
@@ -425,8 +425,22 @@ RenglonNode* MenuRenglonSelection(RenglonNode** list, ArticleNode** articleList,
                 TAB; printf("=================================================="); NL; 
                 NL; getchar();
                 continue;
-            } return SelectRenglonFromList(aux_node);
+            } return aux_node;
         }
+        if (input[0] == '4') {
+            aux_node = SelectRenglonFromList(*list);
+            if (aux_node == NULL) {
+                CLEAR;
+                TAB; printf("=================================================="); NL;
+                TAB; printf("|| El renglon no se encontro en la lista        ||"); NL;
+                TAB; printf("||                                              ||"); NL;
+                TAB; printf("|| ENTER para continuar                         ||"); NL;
+                TAB; printf("=================================================="); NL; 
+                NL; getchar();
+                continue;
+            } return aux_node;
+        }
+
     } return NULL;
 }
 
@@ -722,9 +736,14 @@ void ReadFileFactura(FacturaNode** list, ArticleNode* articleList, VendorNode* v
         PrintSingleClient(aux.Client->data); getchar();
         if (fscanf(f, "%d", &aux.Number) == EOF) { break; }
         if (fscanf(f, "%f", &aux.Total) == EOF) { break; }
-        while (1) {                                   // Loop para los renglones
+        aux.RenglonList = NULL;
+        while (1) {
             if (fscanf(f, "%s", buffer) == EOF) { break; }
-            if (!strcmp(buffer, "ENDOFFACTURA")) { break; }
+            if (!strcmp(buffer, "ENDOFFACTURA")) {
+                if (aux.Client == NULL) { break; }
+                PushFactura(list, aux);
+                break;
+            }
             renglon_aux.art = LookForArticle(articleList, buffer, NULL, ZERO, ZERO);
             if (fscanf(f, "%s", buffer) == EOF) { break; } // Save article code
             renglon_aux.ven = LookForVendor(vendorList, NULL, buffer, NULL_DATE, ZERO);
@@ -735,9 +754,6 @@ void ReadFileFactura(FacturaNode** list, ArticleNode* articleList, VendorNode* v
             PrintSingleRenglon(renglon_aux); getchar();
             PushRenglon(&aux.RenglonList, renglon_aux);
         }
-        if (aux.Client == NULL) { continue; }
-        PrintSingleFactura(aux); getchar();
-        PushFactura(list, aux);
     } fclose(f);
 }
 
@@ -749,7 +765,7 @@ void MenuFactura(FacturaNode** list, ArticleNode** articleList, VendorNode** ven
     while (1) {
         CLEAR;
         TAB; printf("=================================================="); NL;
-        TAB; printf("|| Menu Manejo Articulos                        ||"); NL;
+        TAB; printf("|| Menu Manejo Facturas                         ||"); NL;
         TAB; printf("=================================================="); NL;
         TAB; printf("|| 1. Crear una Factura                         ||"); NL;
         TAB; printf("|| 2. Eliminar una Factura                      ||"); NL;
@@ -812,9 +828,10 @@ void MenuFactura(FacturaNode** list, ArticleNode** articleList, VendorNode** ven
                     NL; getchar();
                     break;
                 }
+                PushFactura(list, aux);
                 SaveFileArticle(*articleList, "Articulos.txt");
                 SaveFileVendor(*vendorList, "Vendedores.txt");
-                PushFactura(list, aux);
+                SaveFileClient(*clientList, "Clientes.txt");
                 SaveFileFactura(*list, "Facturas.txt");
                 PrintSingleFactura(aux); getchar();
                 break;
@@ -831,6 +848,10 @@ void MenuFactura(FacturaNode** list, ArticleNode** articleList, VendorNode** ven
                     NL; getchar();
                     break;
                 } RemovePositionFactura(list, GetPositionFactura(*list, aux_node));
+                SaveFileArticle(*articleList, "Articulos.txt");
+                SaveFileVendor(*vendorList, "Vendedores.txt");
+                SaveFileClient(*clientList, "Clientes.txt");
+                SaveFileFactura(*list, "Facturas.txt");
                 break;
             case '3':
                 if (*list == NULL) { NL; TAB; printf("La lista esta vacia"); NL; getchar(); break; }
@@ -845,6 +866,10 @@ void MenuFactura(FacturaNode** list, ArticleNode** articleList, VendorNode** ven
                     NL; getchar();
                     break;
                 } MenuModificacionFactura(&aux_node, articleList, vendorList, clientList);
+                SaveFileArticle(*articleList, "Articulos.txt");
+                SaveFileVendor(*vendorList, "Vendedores.txt");
+                SaveFileClient(*clientList, "Clientes.txt");
+                SaveFileFactura(*list, "Facturas.txt");
                 break;
             case '4':
                 if (*list == NULL) { NL; TAB; printf("La lista esta vacia"); NL; getchar(); break; }

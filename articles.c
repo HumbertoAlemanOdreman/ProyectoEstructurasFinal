@@ -365,7 +365,7 @@ void ModifyArticle(ArticleNode* globalList, ArticleNode* list) {
                     PrintSingleArticle(list->data); NL;
                     TAB; printf("Ingrese el nuevo codigo del Articulo (NULL para cancelar): "); InputString(input, "%29s");
                 }
-                if (LookForArticle(globalList, NULL, input, ZERO, ZERO != NULL)) {
+                if (LookForArticle(globalList, input, NULL, ZERO, ZERO) != NULL) {
                     CLEAR;
                     TAB; printf("=================================================="); NL;
                     TAB; printf("|| Ese codigo ya se encuentra en la lista       ||"); NL;
@@ -375,6 +375,7 @@ void ModifyArticle(ArticleNode* globalList, ArticleNode* list) {
                     NL; getchar();
                     break;
                 } strcpy(list->data.code, (strcmp(input, "NULL") ? input : list->data.code));
+                break;
             case '3':
                 strcpy(input, "");
                 while (atoi(input) <= 0) {
