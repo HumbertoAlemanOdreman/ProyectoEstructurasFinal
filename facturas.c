@@ -725,7 +725,7 @@ void SaveFileFactura(FacturaNode* list, const char dir[]) {
 
 void ReadFileFactura(FacturaNode** list, ArticleNode* articleList, VendorNode* vendorList, ClientNode* clientList, const char dir[]) {
     FILE *f; f = fopen(dir, "r");
-    if (f == NULL) { fclose(f); return; }
+    if (f == NULL) { return; }
     Factura aux;
     aux.RenglonList = NULL;
     char buffer[256];

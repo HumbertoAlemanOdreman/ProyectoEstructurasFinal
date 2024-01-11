@@ -28,9 +28,13 @@
 #define CLR_BUF while(getchar() != '\n') {}
 #endif 
 
-#ifndef CLEAR
-#define CLEAR if(system("cls")) { system("clear"); }
+#ifdef _WIN32
+#define CLEAR system("cls");
 #endif 
+
+#ifndef _WIN32
+#define CLEAR system("clear");
+#endif
 
 // Malloc
 #ifndef MALLOC_ART
